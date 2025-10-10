@@ -1,30 +1,20 @@
-def preprocess_text(text):
-    # Function to preprocess the input text
-    # This can include lowercasing, removing punctuation, etc.
-    return text.lower()
+from __future__ import annotations
+from typing import List, Dict
+import spacy
 
-def tokenize_text(text):
-    # Function to tokenize the input text into words
-    return text.split()
+# Lazy-load model (so container start is fast)
+_nlp = None
 
-def analyze_sentiment(text):
-    # Placeholder function for sentiment analysis
-    # In a real implementation, this would use a model to analyze sentiment
-    return "Positive" if "good" in text else "Negative"
+def get_nlp():
+    global _nlp
+    if _nlp is None:
+        _nlp = spacy.load("en_core_web_sm")
+    return _nlp
 
-def extract_entities(text):
-    # Placeholder function for entity extraction
-    # In a real implementation, this would use a model to extract entities
-    return ["Entity1", "Entity2"] if "example" in text else []
 
-# Example usage
-if __name__ == "__main__":
-    sample_text = "This is a good example."
-    preprocessed = preprocess_text(sample_text)
-    tokens = tokenize_text(preprocessed)
-    sentiment = analyze_sentiment(preprocessed)
-    entities = extract_entities(preprocessed)
+def split_sentences(text: str) -> List[str]:
+    nlp = get_nlp()
+    doc = nlp(text)
+    # Keep raw sentence text
+    return [sent.text.strip() for sent in doc.sents if sent.text.strip()]
 
-    print("Tokens:", tokens)
-    print("Sentiment:", sentiment)
-    print("Entities:", entities)
