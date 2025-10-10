@@ -25,3 +25,20 @@ def get_engine(db_url: str = "sqlite+pysqlite:///./data.db") -> Engine:
             """
         ))
     return engine
+
+def insert_transcript(engine: Engine, filename: str, transcript: str) -> int:
+    with engine.begin() as conn:
+        res = conn.execute(
+            text("INSERT INTO transcripts (filename, transcript) VALUES (:f, :t)"),
+            {"f": filename, "t": transcript}
+        )
+        tid = res.lastrowid
+    return int(tid)
+
+
+def fetch_transcript(engine: Engine, tid: int) -> Optional[str]:
+    with engine.begin() as conn:
+        row = conn.execute(text("SELECT transcript FROM transcripts WHERE id = :id"), {"id": tid}).fetchone()
+        if row:
+            return row[0]
+    return None
