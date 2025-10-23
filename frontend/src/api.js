@@ -1,25 +1,22 @@
-import axios from 'axios';
+import axios from "axios";
 
-const API_BASE_URL = 'http://localhost:5000'; // Adjust the base URL as needed
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
-export const fetchData = async (endpoint) => {
-    try {
-        const response = await axios.get(`${API_BASE_URL}/${endpoint}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching data:', error);
-        throw error;
-    }
-};
+export async function uploadAudio(file) {
+  const form = new FormData();
+  form.append("file", file);
+  const { data } = await axios.post(`${API_BASE}/upload-audio`, form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return data; // { transcript, transcript_id }
+}
 
-export const postData = async (endpoint, data) => {
-    try {
-        const response = await axios.post(`${API_BASE_URL}/${endpoint}`, data);
-        return response.data;
-    } catch (error) {
-        console.error('Error posting data:', error);
-        throw error;
-    }
-};
+export async function extractQuestions({ text, transcript_id }) {
+  const { data } = await axios.post(`${API_BASE}/extract-questions`, { text, transcript_id });
+  return data; // { questions: [] }
+}
 
-// Add more API functions as needed
+export async function extractQA({ text, transcript_id, max_answer_sents = 3 }) {
+  const { data } = await axios.post(`${API_BASE}/extract-qa`, { text, transcript_id, max_answer_sents });
+  return data; // { items: [{question, answer}] }
+}
