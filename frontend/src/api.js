@@ -20,3 +20,14 @@ export async function extractQuestions({ text, transcript_id }) {
   })
 }
 
+export async function extractQA({ text, transcript_id, max_answer_sents = 3 }) {
+  return http('/extract-qa', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text, transcript_id, max_answer_sents })
+  })
+}
+
+export async function listTranscripts() {
+  try { return await http('/transcripts') } catch { return [] }
+}
