@@ -1,49 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import { useRef , useState } from "react";
+import { uploadAudio } from "../api"
 
-const Recorder = () => {
-    const [isRecording, setIsRecording] = useState(false);
-    const [mediaRecorder, setMediaRecorder] = useState(null);
-    const [audioChunks, setAudioChunks] = useState([]);
+export default function Recorder({ onDone }) {
+    const [recording, setRecording] = useState(false)
+    const [uploading,setUploading] = useState(false)
+    const mediaRef = useRef(null)
+    const chunksRef = useRef([])
 
-    useEffect(() => {
-        if (mediaRecorder) {
-            mediaRecorder.ondataavailable = event => {
-                setAudioChunks(prev => [...prev, event.data]);
-            };
+    const start = async () => {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true})
+        const mr = new MediaRecorder(stream)
 
-            mediaRecorder.onstop = () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                const audioUrl = URL.createObjectURL(audioBlob);
-                const audio = new Audio(audioUrl);
-                audio.play();
-                setAudioChunks([]);
-            };
+        chunksRef.current = []
+
+        mr.ondataavailable = e => {
+            if (e.data.size ) chunksRef.current.push(e.data) }
         }
-    }, [mediaRecorder, audioChunks]);
 
-    const startRecording = async () => {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const recorder = new MediaRecorder(stream);
-        setMediaRecorder(recorder);
-        recorder.start();
-        setIsRecording(true);
-    };
+        mr.onstop = async () => {
+            const blob = new Blob(chunksRef.current, {type: "audio/webm"})
+            const file = new File([blob], 'recording-${Date.now()}.webm' , { type:"audio/webm"})
+            
+        }
 
-    const stopRecording = () => {
-        mediaRecorder.stop();
-        setIsRecording(false);
-    };
-
-    return (
-        <div>
-            <h2>Audio Recorder</h2>
-            {isRecording ? (
-                <button onClick={stopRecording}>Stop Recording</button>
-            ) : (
-                <button onClick={startRecording}>Start Recording</button>
-            )}
-        </div>
-    );
-};
-
-export default Recorder;
+        const 
+    }
+}
