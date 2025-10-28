@@ -35,4 +35,18 @@ export default function Recorder({ onDone }) {
         mr.start()
         setRecording(true)
     }
+    const stop = () => {
+        mediaRef.current?.stop(); setRecording(false)
+    }
+    return (
+    <div className="flex items-center gap-3">
+      {!recording ? (
+        <button className="btn-primary" onClick={start}>Start Recording</button>
+      ) : (
+        <button className="btn bg-red-600 text-white" onClick={stop}>Stop Recording</button>
+      )}
+      {uploading && <span className="text-sm text-gray-600">Uploading…</span>}
+    </div>
+  )
+
 }
