@@ -20,9 +20,19 @@ export default function Recorder({ onDone }) {
         mr.onstop = async () => {
             const blob = new Blob(chunksRef.current, {type: "audio/webm"})
             const file = new File([blob], 'recording-${Date.now()}.webm' , { type:"audio/webm"})
-            
+            setUploading(true)
+            try {
+                const out = await uploadAudio(file)
+                onDone?.(out)
+            }catch(err){
+                alert(err)
+            }finally(
+                setUploading(false)
+                stream.getTracks().forEach( t => t.stop())
+            )
         }
-
-        const 
+        mediaRef.current = mr
+        mr.start()
+        setRecording(true)
     }
 }
